@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Camp Walk Scene</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #15181d;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="sceneCanvas" width="1100" height="600" aria-label="Walking character camp scene"></canvas>
+
+  <script>
+    const canvas = document.getElementById("sceneCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const palette = {
+      body: "#5f2d2a",
+      shadow: "#4e2422",
+      ground: "#2d3138",
+      fireA: "#f7a34f",
+      fireB: "#f26b3f",
+      wood: "#4a342a",
+      tent: "#6a523f",
+      tentShade: "#574334",
+      ember: "#ffd27a",
+      smoke: "rgba(220, 220, 225, 0.35)",
+      stoneA: "#3a3f47",
+      stoneB: "#262a31"
+    };
+
+    let groundY = 470;
+    const fireX = 560;
+    const campX = 790;
+    const fireTargetX = 600;
+    const campTargetX = 735;
+
+    const embers = [];
+    const smokePuffs = [];
+
+    const actor = {
+      x: 680,
+      y: 0,
+      facing: -1,
+      phase: 0,
+      state: "toFire",
+      holdMs: 0
+    };
+
+    function resizeCanvas() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+      groundY = Math.round(h * 0.78);
+      actor.y = groundY;
+    }
+
+    function drawPolygon(points, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i][0], points[i][1]);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function pointFromAngle(x, y, angle, length) {
+      return { x: x + Math.cos(angle) * length, y: y + Math.sin(angle) * length };
+    }
+
+    function clamp01(v) {
+      return Math.max(0, Math.min(1, v));
+    }
+
+    function rand(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function drawGround(t) {
+      // Base ground
+      ctx.fillStyle = palette.ground;
+      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+
+      // Subtle distance gradient (darker farther up)
+      const grad = ctx.createLinearGradient(0, groundY, 0, canvas.height);
+      grad.addColorStop(0, "rgba(0,0,0,0.32)");
+      grad.addColorStop(0.35, "rgba(0,0,0,0.16)");
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+
+      // Fire light pool (screen blend feel via lighter composite)
+      const flick = 0.65 + Math.sin(t * 0.012) * 0.18 + Math.sin(t * 0.027) * 0.09;
+      const glowR = Math.max(160, Math.min(260, canvas.width * 0.22));
+      const g = ctx.createRadialGradient(fireX, groundY - 10, 0, fireX, groundY - 10, glowR);
+      g.addColorStop(0, `rgba(255, 156, 92, ${0.22 * flick})`);
+      g.addColorStop(0.35, `rgba(255, 126, 64, ${0.10 * flick})`);
+      g.addColorStop(1, "rgba(255, 120, 60, 0)");
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      ctx.fillStyle = g;
+      ctx.fillRect(fireX - glowR, groundY - glowR, glowR * 2, glowR * 2);
+      ctx.restore();
+
+      // Darker shadow oval behind the camp objects for depth
+      ctx.fillStyle = "rgba(0,0,0,0.28)";
+      ctx.beginPath();
+      ctx.ellipse(fireX + 25, groundY + 10, 130, 22, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawBentLimb(startX, startY, upperLen, lowerLen, baseAngle, bendAngle, thickness, color) {
+      const joint = pointFromAngle(startX, startY, baseAngle, upperLen);
+      const end = pointFromAngle(joint.x, joint.y, baseAngle + bendAngle, lowerLen);
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = thickness;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(joint.x, joint.y);
+      ctx.lineTo(end.x, end.y);
+      ctx.stroke();
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(joint.x, joint.y, thickness * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+
+      return { joint, end };
+    }
+
+    function drawFoot(x, y, angle, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.ellipse(
+        x + Math.cos(angle) * 2.5,
+        y + Math.sin(angle) * 2.5,
+        7,
+        3,
+        angle * 0.3,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
+
+    function drawStoneRing(x, y) {
+      const stones = [
+        { a: -2.7, r: 26, rx: 8, ry: 5, c: palette.stoneA },
+        { a: -2.0, r: 24, rx: 7, ry: 4.5, c: palette.stoneB },
+        { a: -1.25, r: 25, rx: 8, ry: 5, c: palette.stoneA },
+        { a: -0.55, r: 24, rx: 7.5, ry: 4.5, c: palette.stoneB },
+        { a: 0.2, r: 25, rx: 8, ry: 5, c: palette.stoneA },
+        { a: 0.95, r: 24, rx: 7, ry: 4.3, c: palette.stoneB },
+        { a: 1.65, r: 25, rx: 8, ry: 5, c: palette.stoneA },
+        { a: 2.35, r: 24, rx: 7.2, ry: 4.4, c: palette.stoneB }
+      ];
+
+      for (const s of stones) {
+        const px = x + Math.cos(s.a) * s.r;
+        const py = y + Math.sin(s.a) * (s.r * 0.45);
+        ctx.fillStyle = s.c;
+        ctx.beginPath();
+        ctx.ellipse(px, py, s.rx, s.ry, s.a * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.beginPath();
+        ctx.ellipse(px - 1.8, py - 1.2, s.rx * 0.45, s.ry * 0.35, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawLog(x1, y1, x2, y2, w) {
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.strokeStyle = palette.wood;
+      ctx.lineWidth = w;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      // subtle bark highlight
+      ctx.strokeStyle = "rgba(0,0,0,0.22)";
+      ctx.lineWidth = Math.max(2, w * 0.18);
+      ctx.beginPath();
+      ctx.moveTo(x1 + (x2 - x1) * 0.18, y1 + (y2 - y1) * 0.18);
+      ctx.lineTo(x1 + (x2 - x1) * 0.86, y1 + (y2 - y1) * 0.86);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawCampfire(x, y, t) {
+      // ember bed
+      ctx.fillStyle = "rgba(25, 18, 18, 0.85)";
+      ctx.beginPath();
+      ctx.ellipse(x, y + 6, 22, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // logs
+      drawLog(x - 22, y + 6, x + 18, y + 10, 7);
+      drawLog(x - 18, y + 12, x + 22, y + 4, 7);
+      drawLog(x - 6, y + 14, x + 10, y + 16, 5.5);
+
+      drawStoneRing(x, y + 10);
+
+      const flicker = Math.sin(t * 0.02) * 2.6 + Math.sin(t * 0.031) * 1.4;
+      const heat = 0.72 + Math.sin(t * 0.013) * 0.2;
+
+      // outer glow (screen-like)
+      const glow = ctx.createRadialGradient(x, y - 10, 0, x, y - 10, 70);
+      glow.addColorStop(0, `rgba(255, 190, 120, ${0.26 * heat})`);
+      glow.addColorStop(0.45, `rgba(255, 128, 72, ${0.12 * heat})`);
+      glow.addColorStop(1, "rgba(255, 120, 70, 0)");
+      ctx.save();
+      ctx.globalCompositeOperation = "screen";
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.ellipse(x, y - 8, 78, 55, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      drawPolygon(
+        [
+          [x, y - 28 + flicker],
+          [x + 10, y - 10],
+          [x + 4, y + 3],
+          [x - 5, y + 3],
+          [x - 10, y - 10]
+        ],
+        palette.fireA
+      );
+
+      drawPolygon(
+        [
+          [x + 1, y - 20 + flicker * 0.8],
+          [x + 6, y - 9],
+          [x + 2, y - 1],
+          [x - 2, y - 1],
+          [x - 5, y - 9]
+        ],
+        palette.fireB
+      );
+
+      // hot core
+      ctx.fillStyle = "rgba(255, 238, 200, 0.75)";
+      ctx.beginPath();
+      ctx.ellipse(x + 1, y - 10 + flicker * 0.6, 3.5, 6.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawTent(x, y) {
+      // ground shadow
+      ctx.fillStyle = "rgba(0,0,0,0.28)";
+      ctx.beginPath();
+      ctx.ellipse(x + 6, y + 12, 80, 16, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawPolygon(
+        [
+          [x - 72, y + 10],
+          [x, y - 78],
+          [x + 72, y + 10]
+        ],
+        palette.tent
+      );
+
+      drawPolygon(
+        [
+          [x - 8, y + 10],
+          [x, y - 78],
+          [x + 38, y + 10]
+        ],
+        palette.tentShade
+      );
+
+      // seam line + door hint
+      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y - 78);
+      ctx.lineTo(x, y + 10);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(0,0,0,0.18)";
+      drawPolygon(
+        [
+          [x - 10, y + 10],
+          [x + 10, y + 10],
+          [x + 4, y - 20],
+          [x - 2, y - 18]
+        ],
+        "rgba(0,0,0,0.22)"
+      );
+    }
+
+    function drawCharacter(x, y, facing, phase, moving) {
+      const walk = moving ? Math.sin(phase) : 0;
+      const walkOpp = moving ? Math.sin(phase + Math.PI) : 0;
+      const bob = moving ? Math.sin(phase * 2) * 0.9 : 0;
+      const yy = y + bob;
+      const dir = facing;
+
+      const frontBackPhase = Math.max(0, -walk);
+      const rearBackPhase = Math.max(0, -walkOpp);
+
+      ctx.save();
+      ctx.translate(x, yy);
+      ctx.scale(dir, 1);
+
+      const hipFrontX = 6;
+      const hipRearX = -8;
+      const hipY = -35;
+      const shoulderFrontX = 18;
+      const shoulderRearX = -10;
+      const shoulderY = -96;
+
+      const rearLeg = drawBentLimb(
+        hipRearX,
+        hipY,
+        36,
+        33,
+        Math.PI / 2 + walkOpp * 0.18,
+        -(0.03 + rearBackPhase * 0.45),
+        11,
+        palette.body
+      );
+
+      const rearArm = drawBentLimb(
+        shoulderRearX,
+        shoulderY,
+        28,
+        24,
+        Math.PI / 2 + 0.1 - walk * 0.12,
+        0.25,
+        9,
+        palette.body
+      );
+
+      drawPolygon(
+        [
+          [-18, -118],
+          [20, -124],
+          [30, -44],
+          [-24, -38]
+        ],
+        palette.body
+      );
+
+      drawPolygon(
+        [
+          [-2, -132],
+          [14, -134],
+          [12, -120],
+          [-4, -118]
+        ],
+        palette.body
+      );
+
+      ctx.fillStyle = palette.body;
+      ctx.beginPath();
+      ctx.ellipse(6, -144, 19, 15, -0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      const frontLeg = drawBentLimb(
+        hipFrontX,
+        hipY,
+        38,
+        32,
+        Math.PI / 2 + walk * 0.18,
+        -(0.03 + frontBackPhase * 0.45),
+        12,
+        palette.shadow
+      );
+
+      const frontArm = drawBentLimb(
+        shoulderFrontX,
+        shoulderY,
+        29,
+        25,
+        Math.PI / 2 - 0.1 + walk * 0.12,
+        0.28,
+        9.5,
+        palette.body
+      );
+
+      ctx.fillStyle = palette.shadow;
+      ctx.beginPath();
+      ctx.ellipse(frontArm.end.x, frontArm.end.y, 5.1, 3.9, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = palette.body;
+      ctx.beginPath();
+      ctx.ellipse(rearArm.end.x, rearArm.end.y, 4.7, 3.7, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawFoot(frontLeg.end.x, frontLeg.end.y, Math.PI * 0.08 + walk * 0.04, palette.shadow);
+      drawFoot(rearLeg.end.x, rearLeg.end.y, Math.PI * 0.11 - walk * 0.03, palette.body);
+
+      ctx.restore();
+    }
+
+    function spawnEmber() {
+      embers.push({
+        x: fireX + rand(-6, 6),
+        y: groundY - 18 + rand(-3, 3),
+        vx: rand(-0.02, 0.05),
+        vy: rand(-0.18, -0.06),
+        life: rand(700, 1400),
+        r: rand(1.3, 2.3)
+      });
+    }
+
+    function spawnSmoke() {
+      smokePuffs.push({
+        x: fireX + rand(-10, 10),
+        y: groundY - 26 + rand(-4, 4),
+        vx: rand(0.02, 0.06),
+        vy: rand(-0.05, -0.02),
+        life: rand(2200, 3800),
+        r: rand(6, 12)
+      });
+    }
+
+    function updateAndDrawFireFX(deltaMs, t) {
+      // spawn rates tuned to feel organic
+      if (Math.random() < deltaMs * 0.006) spawnEmber();
+      if (Math.random() < deltaMs * 0.0022) spawnSmoke();
+
+      // embers
+      for (let i = embers.length - 1; i >= 0; i -= 1) {
+        const e = embers[i];
+        e.life -= deltaMs;
+        if (e.life <= 0) {
+          embers.splice(i, 1);
+          continue;
+        }
+        e.x += e.vx * deltaMs;
+        e.y += e.vy * deltaMs;
+        const a = clamp01(e.life / 1200);
+        ctx.fillStyle = `rgba(255, 210, 140, ${0.85 * a})`;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.r * (0.6 + (1 - a) * 0.6), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // smoke
+      for (let i = smokePuffs.length - 1; i >= 0; i -= 1) {
+        const s = smokePuffs[i];
+        s.life -= deltaMs;
+        if (s.life <= 0) {
+          smokePuffs.splice(i, 1);
+          continue;
+        }
+        // drift and expand
+        const wobble = Math.sin((t + i * 999) * 0.0016) * 0.02;
+        s.x += (s.vx + wobble) * deltaMs;
+        s.y += s.vy * deltaMs;
+        s.r += deltaMs * 0.004;
+        const a = clamp01(s.life / 3200);
+        ctx.fillStyle = `rgba(210, 210, 220, ${0.14 * a})`;
+        ctx.beginPath();
+        ctx.ellipse(s.x, s.y, s.r, s.r * 0.76, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function updateActor(deltaMs) {
+      const speed = 0.07 * deltaMs;
+
+      if (actor.state === "toFire") {
+        actor.facing = -1;
+        actor.x = Math.max(fireTargetX, actor.x - speed);
+        actor.phase += 0.0024 * deltaMs;
+        if (actor.x <= fireTargetX) {
+          actor.state = "waitAtFire";
+          actor.holdMs = 0;
+        }
+      } else if (actor.state === "waitAtFire") {
+        actor.facing = -1;
+        actor.holdMs += deltaMs;
+        if (actor.holdMs >= 5000) {
+          actor.state = "toCamp";
+        }
+      } else if (actor.state === "toCamp") {
+        actor.facing = 1;
+        actor.x = Math.min(campTargetX, actor.x + speed);
+        actor.phase += 0.0024 * deltaMs;
+        if (actor.x >= campTargetX) {
+          actor.state = "atCamp";
+        }
+      }
+    }
+
+    function render(timestamp) {
+      if (!render.last) {
+        render.last = timestamp;
+      }
+      const deltaMs = Math.min(40, timestamp - render.last);
+      render.last = timestamp;
+
+      updateActor(deltaMs);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // background sky
+      const sky = ctx.createLinearGradient(0, 0, 0, groundY);
+      sky.addColorStop(0, "#12151c");
+      sky.addColorStop(0.65, "#171b22");
+      sky.addColorStop(1, "#1b1f27");
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, canvas.width, groundY);
+
+      drawGround(timestamp);
+
+      drawCampfire(fireX, groundY - 10, timestamp);
+      updateAndDrawFireFX(deltaMs, timestamp);
+      drawTent(campX, groundY);
+
+      const isMoving = actor.state === "toFire" || actor.state === "toCamp";
+      drawCharacter(actor.x, actor.y, actor.facing, actor.phase, isMoving);
+
+      requestAnimationFrame(render);
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Star Inner World</title>
+  <style>
+    :root {
+      --sky-top: #121b2a;
+      --sky-mid: #24314a;
+      --sky-low: #4a2e46;
+      --tree-far: #1f3340;
+      --tree-mid: #173039;
+      --tree-near: #10252f;
+      --tree-edge: #0d1b24;
+      --ground-1: #1e1a27;
+      --ground-2: #2f1f2b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      background: #090d16;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: #efe3d7;
+    }
+
+    .inner-scene {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 46%, var(--sky-low) 76%, #341f2a 100%);
+    }
+
+    .layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      transform: translate3d(calc(var(--mx, 0) * 1px), calc(var(--my, 0) * 1px), 0);
+      transition: transform 0.2s ease-out;
+    }
+
+    .moon {
+      position: absolute;
+      left: 56%;
+      top: 11%;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 45% 40%, #ffe2b2 0 30%, #f4b97f 31% 65%, transparent 66%),
+        radial-gradient(circle at 50% 50%, rgba(255, 218, 170, 0.9), rgba(255, 190, 130, 0.18) 65%, transparent 100%);
+      filter: drop-shadow(0 0 26px rgba(255, 204, 144, 0.45));
+      opacity: 0.95;
+    }
+
+    .clouds::before,
+    .clouds::after {
+      content: "";
+      position: absolute;
+      width: 62%;
+      height: 88px;
+      left: 16%;
+      border-radius: 999px;
+      background: radial-gradient(ellipse at center, rgba(120, 86, 98, 0.84), rgba(120, 86, 98, 0.08) 70%, transparent 100%);
+      filter: blur(1.1px);
+    }
+
+    .clouds::before { top: 16%; animation: drift 23s linear infinite alternate; }
+    .clouds::after { top: 29%; animation: drift 30s linear infinite alternate-reverse; opacity: 0.7; }
+
+    .stars span {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: rgba(255, 245, 225, 0.9);
+      box-shadow: 0 0 8px rgba(255, 228, 162, 0.55);
+      animation: twinkle var(--d, 3.6s) ease-in-out infinite;
+      opacity: 0.42;
+    }
+
+    .ufo {
+      position: absolute;
+      width: 46px;
+      height: 16px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, #c3d8ea 0%, #6789a8 100%);
+      box-shadow: 0 0 15px rgba(155, 222, 255, 0.42);
+      animation: ufo-float var(--u, 10s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+      opacity: 0.86;
+    }
+
+    .ufo::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -13px;
+      width: 22px;
+      height: 14px;
+      transform: translateX(-50%);
+      border-radius: 50% 50% 40% 40%;
+      background: radial-gradient(circle at 40% 35%, #d4f4ff 0%, #88b3d7 78%);
+      box-shadow: 0 0 12px rgba(162, 220, 255, 0.58);
+    }
+
+    .ufo::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 14px;
+      width: 38px;
+      height: 120px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at 50% 0%, rgba(156, 241, 255, 0.3), rgba(96, 183, 232, 0.11) 35%, rgba(96, 183, 232, 0) 100%);
+      opacity: 0.5;
+      animation: beam 1.1s ease-in-out infinite alternate;
+    }
+
+    .mountains {
+      position: absolute;
+      inset: auto 0 30% 0;
+      height: 44%;
+      z-index: 4;
+    }
+
+    .mountain {
+      position: absolute;
+      bottom: 0;
+      width: var(--w, 500px);
+      height: var(--h, 280px);
+      background: linear-gradient(to bottom, rgba(95, 123, 141, 0.95), rgba(52, 74, 91, 0.96) 46%, rgba(31, 49, 62, 0.98) 100%);
+      clip-path: var(--clip, polygon(0% 100%, 12% 90%, 22% 80%, 33% 66%, 44% 50%, 55% 29%, 63% 18%, 71% 34%, 82% 56%, 91% 78%, 100% 100%));
+      border-radius: 8px 8px 0 0;
+      overflow: hidden;
+    }
+
+    .mountain::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, rgba(248, 251, 255, 0.92) 0 15%, rgba(230, 238, 245, 0.48) 16% 29%, rgba(255, 255, 255, 0) 30% 100%);
+      clip-path: var(--snow, polygon(58% 30%, 64% 18%, 71% 30%, 76% 44%, 68% 41%, 61% 35%));
+      opacity: 0.85;
+    }
+
+    .forest-far { z-index: 8; opacity: 0.82; }
+    .forest-mid { z-index: 10; }
+    .forest-near { z-index: 12; }
+
+    .tree {
+      position: absolute;
+      bottom: 18%;
+      width: 0;
+      height: 0;
+      border-left: 22px solid transparent;
+      border-right: 22px solid transparent;
+      border-bottom: 68px solid var(--tree-far);
+      transform: scale(var(--s, 1));
+      transform-origin: 50% 100%;
+    }
+
+    .tree::before,
+    .tree::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-bottom: 48px solid currentColor;
+    }
+
+    .tree::before { bottom: -14px; }
+    .tree::after { bottom: 20px; }
+    .forest-mid .tree { color: var(--tree-mid); filter: brightness(0.94); }
+    .forest-near .tree { color: var(--tree-near); filter: brightness(0.88); }
+
+    .lake {
+      position: absolute;
+      left: 14%;
+      right: 14%;
+      bottom: 14%;
+      height: 16%;
+      z-index: 7;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(158, 193, 222, 0.32) 0%, rgba(88, 125, 155, 0.22) 36%, rgba(40, 57, 82, 0.12) 67%, rgba(22, 32, 48, 0.04) 100%),
+        linear-gradient(to bottom, rgba(42, 58, 78, 0.7), rgba(20, 30, 44, 0.34));
+      box-shadow: inset 0 0 22px rgba(15, 35, 58, 0.44), 0 0 50px rgba(55, 98, 132, 0.16);
+      filter: blur(0.2px);
+    }
+
+    .ground {
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 36%;
+      z-index: 11;
+      background:
+        radial-gradient(ellipse at 50% 20%, rgba(255, 152, 96, 0.2), transparent 42%),
+        linear-gradient(to top, var(--ground-1) 0%, var(--ground-2) 38%, rgba(55, 35, 49, 0.6) 72%, rgba(55, 35, 49, 0) 100%);
+    }
+
+    .camp {
+      position: absolute;
+      left: 52%;
+      bottom: 14.7%;
+      width: 180px;
+      height: 90px;
+      z-index: 16;
+      pointer-events: none;
+    }
+
+    .camp .tent {
+      position: absolute;
+      right: 14px;
+      bottom: 16px;
+      width: 110px;
+      height: 60px;
+      clip-path: polygon(0 100%, 58% 12%, 100% 100%);
+      background: linear-gradient(118deg, #c77d53 0 46%, #281722 47% 100%);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.36);
+    }
+
+    .camp .fire {
+      position: absolute;
+      left: 48px;
+      bottom: 18px;
+      width: 36px;
+      height: 40px;
+      border-radius: 50% 50% 44% 44%;
+      background: linear-gradient(to top, #ff4a1d 0%, #ff8f30 48%, #ffd777 90%);
+      filter: drop-shadow(0 0 16px rgba(255, 132, 62, 0.76));
+      animation: flame 0.54s ease-in-out infinite alternate;
+    }
+
+    .camp .glow {
+      position: absolute;
+      left: 48px;
+      bottom: 8px;
+      width: 110px;
+      height: 34px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(255, 136, 72, 0.45), rgba(255, 136, 72, 0.08) 62%, rgba(255, 136, 72, 0) 100%);
+      animation: breathe 2.2s ease-in-out infinite;
+    }
+
+    .fox-silhouette {
+      position: absolute;
+      left: 36%;
+      bottom: 15.2%;
+      width: 74px;
+      height: 30px;
+      z-index: 15;
+      background: linear-gradient(to right, rgba(23, 18, 23, 0.95), rgba(8, 8, 11, 0.95));
+      border-radius: 18px 20px 12px 12px;
+      animation: fox-shift 8.6s ease-in-out infinite;
+    }
+
+    .fox-silhouette::before {
+      content: "";
+      position: absolute;
+      left: -20px;
+      top: -3px;
+      width: 24px;
+      height: 18px;
+      border-radius: 48% 44% 44% 50%;
+      background: inherit;
+      transform: rotate(-6deg);
+    }
+
+    .fox-silhouette::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      top: -9px;
+      width: 34px;
+      height: 14px;
+      border-radius: 16px 999px 999px 16px;
+      background: inherit;
+      transform: rotate(16deg);
+    }
+
+    .fireflies {
+      position: absolute;
+      inset: 0;
+      z-index: 17;
+      pointer-events: none;
+    }
+
+    .firefly {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 238, 155, 0.95) 0%, rgba(255, 238, 155, 0.32) 54%, rgba(255, 238, 155, 0) 100%);
+      box-shadow: 0 0 10px rgba(255, 227, 145, 0.55);
+      animation: floaty var(--f, 6.5s) ease-in-out infinite, pulse var(--p, 2.4s) ease-in-out infinite;
+      opacity: 0;
+    }
+
+    .note {
+      position: fixed;
+      left: 14px;
+      bottom: 12px;
+      z-index: 30;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+      color: rgba(248, 229, 212, 0.75);
+      background: rgba(8, 10, 16, 0.42);
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 206, 159, 0.22);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    @keyframes drift {
+      from { transform: translateX(-14px); }
+      to { transform: translateX(24px); }
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.35; transform: scale(1); }
+      50% { opacity: 0.95; transform: scale(1.15); }
+    }
+
+    @keyframes flame {
+      0% { transform: scale(0.94, 0.93) rotate(-2deg); }
+      100% { transform: scale(1.06, 1.1) rotate(2deg); }
+    }
+
+    @keyframes breathe {
+      0% { transform: translateX(-50%) scale(0.95, 0.92); opacity: 0.65; }
+      100% { transform: translateX(-50%) scale(1.07, 1.12); opacity: 0.95; }
+    }
+
+    @keyframes ufo-float {
+      0%, 100% { transform: translate3d(-12px, 0, 0); }
+      40% { transform: translate3d(16px, -10px, 0); }
+      72% { transform: translate3d(-2px, -20px, 0); }
+    }
+
+    @keyframes beam {
+      0% { opacity: 0.35; transform: translateX(-50%) scaleY(0.75); }
+      100% { opacity: 0.7; transform: translateX(-50%) scaleY(1.05); }
+    }
+
+    @keyframes fox-shift {
+      0%, 100% { transform: translateX(0) scaleX(1); }
+      45% { transform: translateX(26px) scaleX(-1); }
+      50% { transform: translateX(26px) scaleX(-1); }
+      95% { transform: translateX(0) scaleX(1); }
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translate(0, 0); }
+      26% { transform: translate(16px, -18px); }
+      56% { transform: translate(-10px, -30px); }
+      82% { transform: translate(10px, -16px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.18; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="inner-scene" id="innerScene">
+    <div class="layer" style="--mx:-0.8;--my:-0.4">
+      <div class="moon"></div>
+      <div class="clouds"></div>
+    </div>
+
+    <div class="stars" id="stars"></div>
+
+    <div class="layer" style="--mx:-1.5;--my:-0.5">
+      <div class="ufo" style="left:13%;top:23%;--u:11.5s;--delay:-1.2s"></div>
+      <div class="ufo" style="left:71%;top:17%;--u:9.2s;--delay:-3.8s;transform:scale(.88)"></div>
+    </div>
+
+    <div class="layer mountains" style="--mx:-0.7;--my:-0.18">
+      <div class="mountain" style="left:-6%;--w:560px;--h:320px"></div>
+      <div class="mountain" style="left:16%;--w:700px;--h:390px;opacity:.92"></div>
+      <div class="mountain" style="left:48%;--w:620px;--h:340px;opacity:.86"></div>
+      <div class="mountain" style="left:79%;--w:360px;--h:210px;opacity:.9"></div>
+    </div>
+
+    <div class="layer forest-far" style="--mx:-1.1;--my:-0.22">
+      <div class="tree" style="left:3%;--s:.6"></div><div class="tree" style="left:9%;--s:.72"></div><div class="tree" style="left:15%;--s:.52"></div>
+      <div class="tree" style="left:22%;--s:.66"></div><div class="tree" style="left:31%;--s:.75"></div><div class="tree" style="left:38%;--s:.58"></div>
+      <div class="tree" style="left:46%;--s:.7"></div><div class="tree" style="left:54%;--s:.62"></div><div class="tree" style="left:63%;--s:.8"></div>
+      <div class="tree" style="left:72%;--s:.68"></div><div class="tree" style="left:80%;--s:.6"></div><div class="tree" style="left:90%;--s:.76"></div>
+    </div>
+
+    <div class="lake"></div>
+
+    <div class="layer forest-mid" style="--mx:-1.8;--my:0.1">
+      <div class="tree" style="left:5%;--s:.92"></div><div class="tree" style="left:12%;--s:1.05"></div><div class="tree" style="left:20%;--s:.86"></div>
+      <div class="tree" style="left:29%;--s:.98"></div><div class="tree" style="left:39%;--s:1.1"></div><div class="tree" style="left:48%;--s:.9"></div>
+      <div class="tree" style="left:57%;--s:1.02"></div><div class="tree" style="left:67%;--s:1.14"></div><div class="tree" style="left:76%;--s:.88"></div>
+      <div class="tree" style="left:85%;--s:1.04"></div><div class="tree" style="left:94%;--s:.9"></div>
+    </div>
+
+    <div class="ground"></div>
+
+    <div class="layer forest-near" style="--mx:-2.3;--my:0.24">
+      <div class="tree" style="left:2%;--s:1.18"></div><div class="tree" style="left:10%;--s:1.3"></div><div class="tree" style="left:19%;--s:1.08"></div>
+      <div class="tree" style="left:28%;--s:1.2"></div><div class="tree" style="left:73%;--s:1.18"></div><div class="tree" style="left:82%;--s:1.32"></div>
+      <div class="tree" style="left:90%;--s:1.1"></div><div class="tree" style="left:97%;--s:1.2"></div>
+    </div>
+
+    <div class="fox-silhouette"></div>
+
+    <div class="camp">
+      <div class="glow"></div>
+      <div class="fire"></div>
+      <div class="tent"></div>
+    </div>
+
+    <div class="fireflies" id="fireflies"></div>
+  </div>
+
+  <div class="note">Inside star world</div>
+
+  <script>
+    const scene = document.getElementById("innerScene");
+    const layers = Array.from(document.querySelectorAll(".layer"));
+    const stars = document.getElementById("stars");
+    const fireflies = document.getElementById("fireflies");
+
+    for (let i = 0; i < 34; i += 1) {
+      const s = document.createElement("span");
+      s.style.left = `${2 + Math.random() * 96}%`;
+      s.style.top = `${4 + Math.random() * 46}%`;
+      s.style.setProperty("--d", `${2.4 + Math.random() * 2.8}s`);
+      stars.appendChild(s);
+    }
+
+    for (let i = 0; i < 18; i += 1) {
+      const dot = document.createElement("span");
+      dot.className = "firefly";
+      dot.style.left = `${8 + Math.random() * 84}%`;
+      dot.style.top = `${26 + Math.random() * 62}%`;
+      dot.style.setProperty("--f", `${4.8 + Math.random() * 4.6}s`);
+      dot.style.setProperty("--p", `${1.6 + Math.random() * 2.8}s`);
+      dot.style.animationDelay = `${Math.random() * 4.5}s`;
+      fireflies.appendChild(dot);
+    }
+
+    function updateParallax(event) {
+      const x = (event.clientX / window.innerWidth - 0.5) * 2;
+      const y = (event.clientY / window.innerHeight - 0.5) * 2;
+      for (const layer of layers) {
+        const mx = parseFloat(layer.style.getPropertyValue("--mx")) || 0;
+        const my = parseFloat(layer.style.getPropertyValue("--my")) || 0;
+        layer.style.transform = `translate3d(${x * mx * 7}px, ${y * my * 7}px, 0)`;
+      }
+    }
+
+    window.addEventListener("pointermove", updateParallax);
+
+    // Touch fallback for subtle motion.
+    let t = 0;
+    setInterval(() => {
+      t += 0.03;
+      if (window.matchMedia("(pointer: coarse)").matches) {
+        const fakeX = window.innerWidth * (0.5 + Math.sin(t) * 0.16);
+        const fakeY = window.innerHeight * (0.5 + Math.cos(t * 0.7) * 0.13);
+        updateParallax({ clientX: fakeX, clientY: fakeY });
+      }
+    }, 45);
+  </script>
+</body>
+</html>
