@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-lang="en" translate="no" class="notranslate">
+<html lang="it" data-lang="it" translate="no" class="notranslate">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -28,6 +28,7 @@
 
         <nav class="nav" aria-label="Primary">
           <a href="#projects" data-i18n="nav.projects">Projects</a>
+          <a href="#offers" data-i18n="nav.offers">Offers</a>
           <a href="#experience" data-i18n="nav.experience">Experience</a>
           <a href="#skills" data-i18n="nav.skills">Skills</a>
           <a href="#contact" data-i18n="nav.contact">Contact</a>
@@ -35,8 +36,8 @@
 
         <div class="header__actions">
           <div class="seg notranslate" role="group" aria-label="Language" translate="no" data-notranslate="true">
-            <button class="seg__btn notranslate" id="langEN" type="button" aria-pressed="true" translate="no">EN</button>
-            <button class="seg__btn notranslate" id="langIT" type="button" aria-pressed="false" translate="no">IT</button>
+            <button class="seg__btn notranslate" id="langEN" type="button" aria-pressed="false" translate="no">EN</button>
+            <button class="seg__btn notranslate" id="langIT" type="button" aria-pressed="true" translate="no">IT</button>
           </div>
           <button class="iconbtn" id="themeToggle" type="button" aria-label="Toggle theme">
             <span class="iconbtn__dot" aria-hidden="true"></span>
@@ -61,7 +62,7 @@
                 5+ years delivering healthcare workforce platforms in Agile teams. Strong on REST API design, performance tuning, and clean frontend engineering.
               </span>
               <span class="muted" data-i18n="hero.sub">
-                Based in Matale, Sri Lanka • Open to EU/Italy opportunities
+                Based in Sri Lanka • Focused on Italy (Bologna) small-business websites and web apps
               </span>
             </p>
 
@@ -70,6 +71,9 @@
               <a class="btn btn--ghost" href="https://lahiruvid.github.io/wixport-pro/index.html#top" target="_blank" rel="noreferrer">
                 <span data-i18n="cta.wixport">WixPort Pro (extension)</span>
               </a>
+              <a class="btn btn--secondary" href="https://wa.me/94774927507?text=Ciao%20Lahiru%2C%20ho%20visto%20il%20tuo%20portfolio%20e%20voglio%20un%20preventivo%20rapido." target="_blank" rel="noreferrer" data-i18n="cta.whatsappNow">
+                WhatsApp now
+              </a>
             </div>
 
             <div class="chips" aria-label="Quick highlights">
@@ -77,12 +81,14 @@
               <span class="chip" data-i18n="chip.health">Healthcare SaaS</span>
               <span class="chip" data-i18n="chip.api">API optimization</span>
               <span class="chip" data-i18n="chip.ux">UI/UX fidelity</span>
+              <span class="chip" data-i18n="chip.dm">Digital Marketing Master's (Bologna University)</span>
             </div>
 
             <div class="hero__links">
               <a class="link" href="https://www.linkedin.com/in/lahiru-abeykoon-052228202" target="_blank" rel="noreferrer">
                 LinkedIn
               </a>
+              <a class="link" href="https://wa.me/94774927507" target="_blank" rel="noreferrer">WhatsApp: +94 77 492 7507</a>
               <button class="link link--button" type="button" id="copyEmail" data-copy="lahiruvid@gmail.com">
                 <span data-i18n="link.copyEmail">Copy email</span>
               </button>
@@ -95,7 +101,7 @@
               <div class="card__top">
                 <div class="avatar" aria-hidden="true">
                   <span class="avatar__ring"></span>
-                  <span class="avatar__core"></span>
+                  <img class="avatar__img" src="./assets/lahiru-profile.png" alt="Lahiru Abeykoon profile photo" />
                 </div>
                 <div class="card__meta">
                   <div class="card__name">Lahiru Abeykoon</div>
@@ -171,89 +177,124 @@
             <article class="pcard">
               <div class="pcard__media">
                 <img
-                  src="./assets/wixport-app.png"
-                  alt="WixPort Pro app UI screenshot"
+                  src="./assets/wixport-desktop.png"
+                  alt="WixPort Pro desktop hero screenshot"
                   loading="lazy"
                 />
               </div>
               <div class="pcard__top">
-                <h3>WixPort Pro</h3>
-                <p class="muted" data-i18n="wix.sub">Wix → Shopify migration toolkit (local CSV processing).</p>
+                <h3 data-i18n="wixcase.h3">WixPort Pro Marketing Site</h3>
+                <p class="muted" data-i18n="wixcase.sub">Commercial landing page for a Chrome extension with pricing and legal pages.</p>
               </div>
               <ul class="pcard__bullets">
-                <li data-i18n="wix.b1">Smart field mapping, HTML cleaning, SEO handles</li>
-                <li data-i18n="wix.b2">Privacy-first: browser-local processing</li>
-                <li data-i18n="wix.b3">Product landing + pricing/policies ready for launch</li>
+                <li data-i18n="wixcase.b1">Clear product flow: Input → Transform → Output</li>
+                <li data-i18n="wixcase.b2">Trust-focused pricing and strong purchase CTA</li>
+                <li data-i18n="wixcase.b3">Fast responsive layout for desktop and mobile traffic</li>
               </ul>
               <div class="pcard__actions">
-                <a class="btn btn--primary" href="https://lahiruvid.github.io/wixport-pro/index.html#top" target="_blank" rel="noreferrer">
-                  <span data-i18n="wix.view">View live site</span>
+                <a class="btn btn--secondary" href="https://lahiruvid.github.io/wixport-pro/" target="_blank" rel="noreferrer" data-i18n="wixcase.view">
+                  View live site
+                </a>
+                <a class="btn btn--ghost" href="https://lahiruvid.github.io/wixport-pro/index.html#top" target="_blank" rel="noreferrer" data-i18n="wixcase.repo">
+                  GitHub repo
                 </a>
               </div>
             </article>
 
             <article class="pcard">
-              <div class="pcard__media pcard__media--phone">
+              <div class="pcard__media">
                 <img
-                  src="./assets/caresystems-dashboard.png"
-                  alt="Healthcare workforce mobile dashboard UI"
+                  src="./assets/dinesh-desktop.png"
+                  alt="Dinesh B&B cleaning desktop hero screenshot"
                   loading="lazy"
                 />
               </div>
               <div class="pcard__top">
-                <h3 data-i18n="care.h3">Healthcare Mobile Dashboard</h3>
-                <p class="muted" data-i18n="care.sub">Mobile-first UI for workforce management (React).</p>
+                <h3 data-i18n="italy.h3">Italy-ready Local Website Formula</h3>
+                <p class="muted" data-i18n="italy.sub">A reusable layout pattern I use for local businesses in Italy.</p>
               </div>
               <ul class="pcard__bullets">
-                <li data-i18n="care.b1">Designed clean navigation and quick actions for daily use</li>
-                <li data-i18n="care.b2">Optimized layout for small screens with accessible touch targets</li>
-                <li data-i18n="care.b3">Delivered pixel-accurate UI aligned to product requirements</li>
+                <li data-i18n="italy.b1">Service clarity in first 5 seconds</li>
+                <li data-i18n="italy.b2">WhatsApp-first conversion strategy</li>
+                <li data-i18n="italy.b3">Social-proof blocks and fast quote UX</li>
               </ul>
               <div class="pcard__actions">
-                <a class="btn btn--secondary" href="#experience" data-i18n="care.seeExp">See related experience</a>
-              </div>
-            </article>
-
-            <article class="pcard">
-              <div class="pcard__top">
-                <h3>Camp Walk Scene (Canvas)</h3>
-                <p class="muted" data-i18n="camp.sub">Hand-crafted animation: character walk cycle, fire FX, smoke.</p>
-              </div>
-              <ul class="pcard__bullets">
-                <li data-i18n="camp.b1">2D canvas rendering + procedural motion</li>
-                <li data-i18n="camp.b2">Responsive viewport scaling</li>
-                <li data-i18n="camp.b3">Fire glow, embers, smoke simulation</li>
-              </ul>
-              <div class="pcard__actions">
-                <button class="btn btn--secondary" type="button" data-demo-open="../alto-sprite-generator.html" data-i18n="demo.preview">
-                  Preview
-                </button>
-                <a class="btn btn--ghost" href="../alto-sprite-generator.html" target="_blank" rel="noreferrer" data-i18n="demo.open">
-                  Open demo
+                <a class="btn btn--secondary" href="https://wa.me/94774927507?text=Ciao%20Lahiru%2C%20vorrei%20un%20sito%20simile%20a%20questo." target="_blank" rel="noreferrer" data-i18n="italy.cta">
+                  Request this style
                 </a>
-              </div>
-            </article>
-
-            <article class="pcard">
-              <div class="pcard__top">
-                <h3>Relaxing Forest Depth Scene</h3>
-                <p class="muted" data-i18n="forest.sub">Parallax scene composition + interaction design.</p>
-              </div>
-              <ul class="pcard__bullets">
-                <li data-i18n="forest.b1">Layered gradients, lighting, depth cues</li>
-                <li data-i18n="forest.b2">Portal overlay experience</li>
-                <li data-i18n="forest.b3">Polished UI micro-interactions</li>
-              </ul>
-              <div class="pcard__actions">
-                <button class="btn btn--secondary" type="button" data-demo-open="../index.html" data-i18n="demo.preview">
-                  Preview
-                </button>
-                <a class="btn btn--ghost" href="../index.html" target="_blank" rel="noreferrer" data-i18n="demo.open">
-                  Open demo
+                <a class="btn btn--ghost" href="https://lahiruvid.github.io/Dinesh-B-B/#servizi" target="_blank" rel="noreferrer" data-i18n="italy.repo">
+                  Portfolio repo
                 </a>
               </div>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section class="section section--alt" id="offers">
+        <div class="container">
+          <div class="section__head">
+            <h2 data-i18n="offers.h2">Packages that close fast</h2>
+            <p class="muted" data-i18n="offers.sub">Transparent pricing in EUR, built for small businesses in Italy.</p>
+          </div>
+
+          <div class="offers">
+            <article class="offer">
+              <p class="offer__tag" data-i18n="offers.starter.tag">Most requested for new businesses</p>
+              <h3 data-i18n="offers.starter.h3">Starter Website</h3>
+              <p class="offer__price">€149</p>
+              <ul class="offer__list">
+                <li data-i18n="offers.starter.b1">1-page modern website (mobile optimized)</li>
+                <li data-i18n="offers.starter.b2">WhatsApp + Call + Google Maps integration</li>
+                <li data-i18n="offers.starter.b3">Delivery in 3-4 days</li>
+              </ul>
+            </article>
+
+            <article class="offer offer--featured">
+              <p class="offer__tag" data-i18n="offers.business.tag">Best value (hard to say no)</p>
+              <h3 data-i18n="offers.business.h3">Business Growth Site</h3>
+              <p class="offer__price">€299</p>
+              <ul class="offer__list">
+                <li data-i18n="offers.business.b1">Everything in Starter + up to 5 pages</li>
+                <li data-i18n="offers.business.b2">Basic SEO setup + conversion copy</li>
+                <li data-i18n="offers.business.b3">1 promotional poster + social post kit</li>
+              </ul>
+            </article>
+
+            <article class="offer">
+              <p class="offer__tag" data-i18n="offers.webapp.tag">For custom digital workflows</p>
+              <h3 data-i18n="offers.webapp.h3">Small Web App / Software</h3>
+              <p class="offer__price">From €599</p>
+              <ul class="offer__list">
+                <li data-i18n="offers.webapp.b1">Booking, quoting, dashboard, or automation tool</li>
+                <li data-i18n="offers.webapp.b2">Custom frontend + backend API</li>
+                <li data-i18n="offers.webapp.b3">Phased delivery and support options</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="offers__cta">
+            <a class="btn btn--primary" href="https://wa.me/94774927507?text=Ciao%20Lahiru%2C%20voglio%20bloccare%20un%20pacchetto.%20Quando%20puoi%20iniziare%3F" target="_blank" rel="noreferrer" data-i18n="offers.cta">
+              Lock your slot on WhatsApp
+            </a>
+            <p class="muted small" data-i18n="offers.note">Launch offer: free revision round + fast response within 1 hour (8:00-22:00 Italy time).</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="poster-kit">
+        <div class="container">
+          <article class="poster-pack">
+            <div>
+              <h2 data-i18n="poster.h2">Poster package included</h2>
+              <p class="muted" data-i18n="poster.sub">
+                I created a separate poster package you can share in Facebook groups, WhatsApp statuses, and local pages.
+              </p>
+            </div>
+            <div class="poster-pack__actions">
+              <a class="btn btn--secondary" href="./poster-package/index.html" target="_blank" rel="noreferrer" data-i18n="poster.open">Open poster package</a>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -327,7 +368,7 @@
                 <strong data-i18n="edu.d2">A/L (Engineering Technology)</strong> — <span data-i18n="edu.d2s">St. Thomas’ College, Matale</span>
                 <span class="muted" data-i18n="edu.d2x">(Island Rank 46, District Rank 3 • Z-Score 2.6116)</span>
               </li>
-              <li><strong data-i18n="edu.d3">Master in Digital Marketing</strong> <span data-i18n="edu.d3x">(modules completed)</span> — <span data-i18n="edu.d3s">Bologna Business School, Italy</span></li>
+              <li><strong data-i18n="edu.d3">Master in Digital Marketing</strong> — <span data-i18n="edu.d3s">University of Bologna, Italy</span></li>
               <li><strong data-i18n="edu.d4">IELTS</strong> — <span data-i18n="edu.d4s">Overall Band 7.0 (British Council)</span></li>
               <li><strong data-i18n="edu.d5">Languages</strong> — <span data-i18n="edu.d5s">English (Professional), Sinhalese (Native), Italian (Beginner)</span></li>
             </ul>
@@ -348,6 +389,7 @@
               <div class="contact__links">
                 <a class="btn btn--primary" href="mailto:lahiruvid@gmail.com">lahiruvid@gmail.com</a>
                 <a class="btn btn--secondary" href="tel:+94774927507">+94 77 492 7507</a>
+                <a class="btn btn--secondary" href="https://wa.me/94774927507?text=Ciao%20Lahiru%2C%20ho%20bisogno%20di%20un%20sito%20per%20la%20mia%20attivit%C3%A0." target="_blank" rel="noreferrer">WhatsApp</a>
                 <a class="btn btn--ghost" href="https://www.linkedin.com/in/lahiru-abeykoon-052228202" target="_blank" rel="noreferrer">
                   <span data-i18n="contact.linkedin">LinkedIn profile</span>
                 </a>
@@ -369,7 +411,8 @@
               <div class="kvs">
                 <div class="kv"><span class="kv__k">Email</span><span class="kv__v">lahiruvid@gmail.com</span></div>
                 <div class="kv"><span class="kv__k">Phone</span><span class="kv__v">+94 77 492 7507</span></div>
-                <div class="kv"><span class="kv__k">Location</span><span class="kv__v">Matale, Sri Lanka</span></div>
+                <div class="kv"><span class="kv__k">WhatsApp</span><span class="kv__v">0774927507</span></div>
+                <div class="kv"><span class="kv__k">Location</span><span class="kv__v">Bologna-friendly remote delivery</span></div>
               </div>
             </div>
           </div>

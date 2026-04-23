@@ -275,6 +275,15 @@ h1 {
   background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
   border: 1px solid var(--line);
 }
+.avatar__img {
+  position: absolute;
+  inset: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  object-fit: cover;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+}
 
 .card__name { font-weight: 700; letter-spacing: -0.3px; }
 .card__role, .card__loc { color: var(--muted); font-size: 13px; }
@@ -366,6 +375,80 @@ h2 {
 .pcard h3 { margin: 0 0 6px; letter-spacing: -0.3px; }
 .pcard__bullets { margin: 12px 0 0; padding-left: 18px; color: var(--muted); }
 .pcard__actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+.offers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.offer {
+  background: var(--card2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.offer--featured {
+  background: linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      color-mix(in srgb, var(--accent2) 16%, transparent)
+    ),
+    var(--card2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+}
+.offer__tag {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: color-mix(in srgb, var(--card) 75%, transparent);
+}
+.offer h3 {
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+.offer__price {
+  margin: 0 0 10px;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.offer__list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+.offers__cta {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.poster-pack {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card2);
+  padding: 18px;
+}
+.poster-pack h2 {
+  margin-bottom: 8px;
+}
+.poster-pack__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
 .showcase {
   margin: 14px 0 16px;
@@ -543,8 +626,10 @@ h2 {
 @media (max-width: 920px) {
   .hero__inner { grid-template-columns: 1fr; }
   .cards { grid-template-columns: 1fr; }
+  .offers { grid-template-columns: 1fr; }
   .skills { grid-template-columns: 1fr; }
   .contact { grid-template-columns: 1fr; }
+  .poster-pack { flex-direction: column; align-items: flex-start; }
   .nav { display: none; }
   .showcase__featured { grid-template-columns: 1fr; }
   .showcase__peek iframe { transform: scale(0.72); transform-origin: 50% 28%; }
