@@ -3,7 +3,7 @@
 Senior Full-Stack Engineer profile (Java / React) for academic and engineering applications.
 
 **Live site (use this in Europass → Website):**  
-https://lahiruvid.github.io/Portfolio/portfolio/
+https://lahiruvid.github.io/Portfolio/
 
 ## Sections
 
@@ -15,8 +15,8 @@ https://lahiruvid.github.io/Portfolio/portfolio/
 
 ## Local preview
 
-Open `portfolio/index.html` or serve the folder:
+Open `index.html` or serve the folder:
 
 ```bash
-npx serve portfolio
+npx serve .
 ```
