@@ -187,11 +187,11 @@ function setTheme(theme) {
   if (theme === "dark") root.setAttribute("data-theme", "dark");
   else root.setAttribute("data-theme", "light");
   document.body?.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
-  localStorage.setItem("portfolio.theme", JSON.stringify(theme));
+  localStorage.setItem("portfolio.theme.v2", JSON.stringify(theme));
 }
 
 function getInitialTheme() {
-  const stored = safeJsonParse(localStorage.getItem("portfolio.theme"));
+  const stored = safeJsonParse(localStorage.getItem("portfolio.theme.v2"));
   if (stored === "light" || stored === "dark") return stored;
   // Prefer professional light theme for academic / MSc applications
   return "light";
