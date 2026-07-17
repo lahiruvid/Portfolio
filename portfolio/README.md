@@ -1,19 +1,22 @@
-# Portfolio (Lahiru Abeykoon)
+# Portfolio — Lahiru Abeykoon
 
-Open `portfolio/index.html` in your browser.
+Senior Full-Stack Engineer profile (Java / React) for academic and engineering applications.
 
-## What’s included
+**Live site (use this in Europass → Website):**  
+https://lahiruvid.github.io/Portfolio/portfolio/
 
-- Projects section linking to:
-  - WixPort Pro landing page
-  - Your HTML/CSS/Canvas demos in this repo
-- CV-based Experience, Skills, Education + contact CTA
-- Light/dark theme toggle and “copy email”
+## Sections
 
-## Deploy (GitHub Pages)
+- Hero — Senior Full-Stack Engineer positioning + MSc CS (Poland)
+- Featured Engineering — ArkaTask + Wix → Shopify migrator
+- Experience — Care Systems (enterprise healthcare)
+- Skills — Backend / Frontend / Cloud·DevOps
+- About + Contact
 
-If this repo is on GitHub, you can publish `portfolio/` using one of these options:
+## Local preview
 
-- **Option A (recommended)**: move the contents of `portfolio/` to the repo root so GitHub Pages can serve `index.html` directly.
-- **Option B**: use a Pages workflow that publishes from a `/docs` folder, and rename `portfolio/` → `docs/`.
+Open `portfolio/index.html` or serve the folder:
 
+```bash
+npx serve portfolio
+```

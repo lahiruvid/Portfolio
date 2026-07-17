@@ -376,6 +376,48 @@ h2 {
 .pcard__bullets { margin: 12px 0 0; padding-left: 18px; color: var(--muted); }
 .pcard__actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
 
+.cards--featured {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.pcard--featured {
+  background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--accent) 10%, transparent),
+      color-mix(in srgb, var(--accent2) 8%, transparent)
+    ),
+    var(--card2);
+}
+.badge {
+  display: inline-flex;
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: color-mix(in srgb, var(--card) 80%, transparent);
+}
+.titem--featured {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      transparent 55%
+    ),
+    var(--card2);
+}
+.about__text {
+  max-width: 780px;
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .cards--featured { grid-template-columns: 1fr; }
+}
+
 .offers {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
