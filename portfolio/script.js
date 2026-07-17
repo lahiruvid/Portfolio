@@ -48,8 +48,8 @@ const I18N = {
     "feat.wix.b1": "Local CSV processing with smart field mapping and HTML cleanup",
     "feat.wix.b2": "Privacy-first: data stays in the browser",
     "feat.wix.b3": "Built for reliable Wix → Shopify catalog transfers",
-    "feat.wix.live": "Product site",
-    "feat.wix.repo": "Extension repo",
+    "feat.wix.live": "Chrome Web Store",
+    "feat.wix.repo": "Product site",
     "exp.h2": "Experience",
     "exp.sub": "Enterprise delivery, clean architecture, and mentoring.",
     "exp.badge": "Primary role",
@@ -134,8 +134,8 @@ const I18N = {
     "feat.wix.b1": "Elaborazione CSV locale con mapping campi e pulizia HTML",
     "feat.wix.b2": "Privacy-first: i dati restano nel browser",
     "feat.wix.b3": "Trasferimenti catalogo Wix → Shopify affidabili",
-    "feat.wix.live": "Sito prodotto",
-    "feat.wix.repo": "Repo estensione",
+    "feat.wix.live": "Chrome Web Store",
+    "feat.wix.repo": "Sito prodotto",
     "exp.h2": "Esperienza",
     "exp.sub": "Delivery enterprise, architettura pulita e mentoring.",
     "exp.badge": "Ruolo principale",
@@ -183,16 +183,18 @@ const I18N = {
 
 function setTheme(theme) {
   const root = document.documentElement;
-  if (theme === "light") root.setAttribute("data-theme", "light");
-  else root.removeAttribute("data-theme");
+  // Light is the academic default; dark is opt-in
+  if (theme === "dark") root.setAttribute("data-theme", "dark");
+  else root.setAttribute("data-theme", "light");
+  document.body?.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
   localStorage.setItem("portfolio.theme", JSON.stringify(theme));
 }
 
 function getInitialTheme() {
   const stored = safeJsonParse(localStorage.getItem("portfolio.theme"));
   if (stored === "light" || stored === "dark") return stored;
-  const prefersLight = window.matchMedia?.("(prefers-color-scheme: light)")?.matches;
-  return prefersLight ? "light" : "dark";
+  // Prefer professional light theme for academic / MSc applications
+  return "light";
 }
 
 function applyI18n(lang) {
@@ -271,10 +273,10 @@ function toast(message) {
   t.style.maxWidth = "calc(100% - 40px)";
   t.style.textAlign = "center";
 
-  if (document.documentElement.getAttribute("data-theme") === "light") {
-    t.style.border = "1px solid rgba(12,18,40,0.16)";
-    t.style.background = "rgba(255,255,255,0.78)";
-    t.style.color = "rgba(12,18,40,0.90)";
+  if (document.documentElement.getAttribute("data-theme") !== "dark") {
+    t.style.border = "1px solid rgba(15,23,42,0.12)";
+    t.style.background = "rgba(255,255,255,0.92)";
+    t.style.color = "rgba(15,23,42,0.90)";
   }
 
   document.body.appendChild(t);
@@ -295,8 +297,8 @@ function main() {
   document.getElementById("langIT")?.addEventListener("click", () => setLang("it"));
 
   document.getElementById("themeToggle")?.addEventListener("click", () => {
-    const isLight = document.documentElement.getAttribute("data-theme") === "light";
-    setTheme(isLight ? "dark" : "light");
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    setTheme(isDark ? "light" : "dark");
   });
 
   const copyEmail = document.getElementById("copyEmail");
